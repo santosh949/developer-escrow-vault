@@ -3,25 +3,61 @@
 import { createClient } from '@/utils/supabase/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
   const supabase = createClient();
   const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [step, setStep] = useState<1 | 2>(1);
 
-  const handleMagicLink = async (e: React.FormEvent) => {
+  const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setMessage('');
+    
+    // Request a 6-digit OTP code to the email
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        shouldCreateUser: true,
       },
     });
-    if (error) setMessage(error.message);
-    else setMessage('Check your email for the Neural Link access code.');
+    
+    if (error) {
+      setMessage(error.message);
+    } else {
+      setMessage('OTP sent. Check your email for the 6-digit code.');
+      setStep(2);
+    }
     setLoading(false);
+  };
+
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setMessage('');
+    
+    // Verify the 6-digit OTP code
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token: otp,
+      type: 'email'
+    });
+
+    if (error) {
+      setMessage(error.message);
+      setLoading(false);
+    } else {
+      setMessage('Neural Link established. Routing...');
+      // 500ms propagation buffer to ensure the session cookie sets before routing
+      setTimeout(() => {
+        router.push('/dashboard');
+      }, 500);
+    }
   };
 
   const handleGoogleLogin = async () => {
@@ -47,36 +83,70 @@ export default function LoginPage() {
         </h1>
         <p className="text-neutral-500 text-xs text-center mb-8">AUTHENTICATION REQUIRED</p>
 
-        <form onSubmit={handleMagicLink} className="space-y-4">
-          <div>
-            <input 
-              type="email" 
-              placeholder="operator@system.com" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-neutral-900 border border-neutral-800 text-green-400 text-sm px-4 py-2 rounded focus:outline-none focus:border-green-500 transition-colors"
-              required
-            />
-          </div>
-          <button 
-            type="submit"
-            disabled={loading}
-            className="w-full bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold py-2 rounded transition-colors text-sm"
-          >
-            {loading ? 'TRANSMITTING...' : 'SEND MAGIC LINK'}
-          </button>
-        </form>
+        {step === 1 ? (
+          <form onSubmit={handleRequestOtp} className="space-y-4">
+            <div>
+              <input 
+                type="email" 
+                placeholder="operator@system.com" 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-neutral-900 border border-neutral-800 text-green-400 text-sm px-4 py-2 rounded focus:outline-none focus:border-green-500 transition-colors"
+                required
+              />
+            </div>
+            <button 
+              type="submit"
+              disabled={loading}
+              className="w-full bg-neutral-800 hover:bg-neutral-700 text-neutral-300 font-bold py-2 rounded transition-colors text-sm"
+            >
+              {loading ? 'TRANSMITTING...' : 'REQUEST ACCESS CODE'}
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifyOtp} className="space-y-4">
+            <div>
+              <input 
+                type="text" 
+                placeholder="000000" 
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                maxLength={6}
+                className="w-full bg-neutral-900 border border-neutral-800 text-green-400 text-center text-2xl tracking-widest px-4 py-3 rounded focus:outline-none focus:border-green-500 transition-colors"
+                required
+              />
+            </div>
+            <button 
+              type="submit"
+              disabled={loading}
+              className="w-full bg-green-600/90 hover:bg-green-500 text-black font-bold py-2 rounded transition-colors text-sm shadow-[0_0_15px_rgba(0,255,0,0.3)] hover:shadow-[0_0_25px_rgba(0,255,0,0.5)]"
+            >
+              {loading ? 'VERIFYING...' : 'INITIALIZE LINK'}
+            </button>
+            <button 
+              type="button"
+              onClick={() => { setStep(1); setMessage(''); setOtp(''); }}
+              className="w-full text-neutral-500 hover:text-neutral-300 text-xs mt-2"
+            >
+              ← Back to Email Input
+            </button>
+          </form>
+        )}
 
-        <div className="my-6 border-t border-neutral-800 relative">
-          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black px-2 text-xs text-neutral-600">OR</span>
-        </div>
+        {step === 1 && (
+          <>
+            <div className="my-6 border-t border-neutral-800 relative">
+              <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-black px-2 text-xs text-neutral-600">OR</span>
+            </div>
 
-        <button 
-          onClick={handleGoogleLogin}
-          className="w-full bg-green-600/90 hover:bg-green-500 text-black font-bold py-2 rounded transition-colors text-sm shadow-[0_0_15px_rgba(0,255,0,0.3)] hover:shadow-[0_0_25px_rgba(0,255,0,0.5)]"
-        >
-          INITIALIZE NEURAL LINK (GOOGLE)
-        </button>
+            <button 
+              onClick={handleGoogleLogin}
+              className="w-full bg-green-600/90 hover:bg-green-500 text-black font-bold py-2 rounded transition-colors text-sm shadow-[0_0_15px_rgba(0,255,0,0.3)] hover:shadow-[0_0_25px_rgba(0,255,0,0.5)]"
+            >
+              INITIALIZE NEURAL LINK (GOOGLE)
+            </button>
+          </>
+        )}
 
         {message && (
           <p className="mt-4 text-xs text-center text-green-400">{message}</p>
