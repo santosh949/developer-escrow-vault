@@ -46,25 +46,23 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const initialize = async () => {
-      // Use getUser instead of getSession to guarantee the most up-to-date server state.
-      // getSession can sometimes return stale client-side caches during fast redirects.
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) {
-        router.push('/login'); 
+      // Middleware handles route protection — just fetch the session here.
+      // getSession reads from the cookie the middleware already set/refreshed.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Fallback redirect if middleware somehow misses
+        router.push('/login');
         return;
-      } 
-      setUserId(user.id);
-      const { data: benData } = await supabase.from('beneficiaries').select('id, name, email').eq('user_id', user.id);
+      }
+      setUserId(session.user.id);
+      const { data: benData } = await supabase
+        .from('beneficiaries')
+        .select('id, name, email')
+        .eq('user_id', session.user.id);
       if (benData) setBeneficiaries(benData);
       setSessionLoading(false);
     };
-
-    // Vercel Edge propagation buffer
-    const timer = setTimeout(() => {
-      initialize();
-    }, 300);
-
-    return () => clearTimeout(timer);
+    initialize();
   }, [router, supabase]);
 
   const hashKeyLocally = async (key: string) => {
