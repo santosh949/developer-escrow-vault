@@ -3,10 +3,8 @@
 import { createClient } from '@/utils/supabase/client';
 import { motion } from 'framer-motion';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const router = useRouter();
   const supabase = createClient();
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
@@ -53,10 +51,9 @@ export default function LoginPage() {
       setLoading(false);
     } else {
       setMessage('Neural Link established. Routing...');
-      // 500ms propagation buffer to ensure the session cookie sets before routing
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 500);
+      // Hard redirect forces a full HTTP request so middleware
+      // can read the new session cookie set by verifyOtp
+      window.location.href = '/dashboard';
     }
   };
 
