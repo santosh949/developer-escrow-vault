@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VAULT_OS | System Protocols</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        :root {
+            --geist: 'Inter', sans-serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+        body {
+            background-color: #0d1515;
+            color: #dce4e4;
+            font-family: var(--geist);
+        }
+        .font-headline-md { font-family: var(--geist); }
+        .font-label-code { font-family: var(--mono); }
+        .font-label-caps { font-family: var(--mono); text-transform: none; }
+        
+        .glass-panel {
+            background: rgba(21, 29, 29, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(58, 73, 74, 0.3);
+        }
+
+        .liquid-glow:hover {
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.15);
+        }
+
+        .cyber-grid {
+            background-image: linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        /* Spring Transition for Protocol Cards */
+        .protocol-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center;
+        }
+        .protocol-card:hover {
+            transform: scale(1.02) translateY(-2px);
+            background: rgba(0, 245, 255, 0.03);
+            border-color: rgba(0, 245, 255, 0.4);
+        }
+
+        /* Digital Dust Particles */
+        #particle-container {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #00f5ff;
+            opacity: 0.3;
+            border-radius: 50%;
+            animation: float 8s infinite linear;
+        }
+        @keyframes float {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            50% { opacity: 0.5; }
+            100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
+        }
+
+        /* Custom range slider styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            background: #192121;
+            border-radius: 2px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 8px;
+            background: #00f5ff;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+        }
+
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .deploy-button.processing {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        .deploy-button .loader {
+            display: none;
+        }
+        .deploy-button.processing .loader {
+            display: inline-block;
+        }
+        .deploy-button.processing .btn-text {
+            display: none;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#00f5ff",
+                        "outline-variant": "#3a494a",
+                        "surface-container-low": "#151d1d",
+                        "surface-container-lowest": "#081010",
+                        "surface-bright": "#323b3b",
+                        "tertiary-fixed": "#ffe16c",
+                        "surface-container-highest": "#2e3637",
+                        "secondary-fixed": "#61ff97",
+                        "on-error": "#690005",
+                        "secondary": "#f5fff2",
+                        "on-surface-variant": "#b9caca",
+                        "error-container": "#93000a",
+                        "background": "#0d1515",
+                        "on-secondary-fixed-variant": "#005227",
+                        "tertiary": "#fff9f0",
+                        "primary-fixed": "#63f7ff",
+                        "on-tertiary-container": "#736000",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#e7c427",
+                        "surface-container-high": "#232b2c",
+                        "inverse-surface": "#dce4e4",
+                        "secondary-fixed-dim": "#00e476",
+                        "on-primary-fixed": "#002021",
+                        "on-secondary-fixed": "#00210c",
+                        "surface-variant": "#2e3637",
+                        "outline": "#849495",
+                        "on-primary": "#003739",
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#221b00",
+                        "tertiary-container": "#ffdb3f",
+                        "on-tertiary-fixed-variant": "#544600",
+                        "on-tertiary": "#3a3000",
+                        "surface-tint": "#00dce5",
+                        "surface": "#0d1515",
+                        "on-secondary": "#003919",
+                        "on-primary-fixed-variant": "#004f53",
+                        "primary": "#e9feff",
+                        "surface-dim": "#0d1515",
+                        "on-primary-container": "#006c71",
+                        "surface-container": "#192121",
+                        "inverse-on-surface": "#2a3232",
+                        "on-secondary-container": "#007238",
+                        "inverse-primary": "#00696e",
+                        "secondary-container": "#36ff8b",
+                        "on-surface": "#dce4e4",
+                        "on-background": "#dce4e4",
+                        "primary-fixed-dim": "#00dce5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "sm": "8px",
+                        "margin": "32px",
+                        "lg": "24px",
+                        "gutter": "20px",
+                        "unit": "4px",
+                        "xs": "4px",
+                        "xl": "48px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Geist"],
+                        "body-lg": ["Geist"],
+                        "label-caps": ["JetBrains Mono"],
+                        "headline-md": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "label-code": ["JetBrains Mono"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-code": ["13px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background min-h-screen overflow-hidden flex flex-col cyber-grid">
+<!-- TopAppBar -->
+<header class="bg-surface-container-low/70 backdrop-blur-xl text-primary-container font-headline-md text-headline-md border-b border-outline-variant/30 shadow-[0_0_15px_rgba(0,245,255,0.05)] flex justify-between items-center w-full px-lg h-16 z-50 fixed top-0">
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-label-caps tracking-widest text-primary-fixed">VAULT_OS</span>
+<span class="h-4 w-[1px] bg-outline-variant/50"></span>
+<span class="font-label-code text-label-code opacity-70 tracking-tight">SETTINGS_PROTOCOLS</span>
+</div>
+<div class="flex items-center gap-lg">
+<div class="hidden md:flex items-center gap-md">
+<div class="flex items-center gap-xs px-sm py-1 rounded bg-primary-container/5 border border-primary-container/20">
+<span class="material-symbols-outlined text-[14px]">lan</span>
+<span class="font-label-code text-label-code text-primary-fixed tracking-tight">Protocol v4.2</span>
+</div>
+<div class="flex items-center gap-xs px-sm py-1 rounded bg-secondary-container/5 border border-secondary-fixed/20">
+<span class="material-symbols-outlined text-[14px]">security</span>
+<span class="font-label-code text-label-code text-secondary-fixed tracking-tight">Secure Node</span>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined hover:bg-primary-container/10 p-2 rounded transition-colors">notifications</button>
+<img alt="User Avatar" class="w-8 h-8 rounded-full border border-primary-container/30" src="https://lh3.googleusercontent.com/aida/AP1WRLu45PvnPdckYzwuxssmVic4ZROkcKYfvooAuhqR2YWvoZxIUrKc-1Tdf6jgDNmX_nlmgitfQXeTaE_TrvF7SkjRZRY6DjJ19dsLqv91xCYF_X6Gk2ukSYFmU9IOtGaGioFLWs96GpDGRg5gCHlQkRNcT8Qdm4T7QtD7ZnHbr6zRkKMApZVeNGz2O-NEysrVXMAbMMJvKmn-6S28ei32Fgwrp85wsoZq-Gc5HnwJX2hEAlJ9_gfIIMrs9H8"/>
+</div>
+</div>
+</header>
+<div class="flex flex-1 pt-16 h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="bg-surface-container-lowest/80 backdrop-blur-2xl fixed left-0 top-0 h-full w-[260px] border-r border-outline-variant/20 shadow-xl flex flex-col py-lg gap-sm z-40">
+<div class="px-md mb-xl mt-4">
+<div class="flex items-center gap-md mb-2">
+<div class="w-10 h-10 bg-primary-container/10 border border-primary-container/30 rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container">shield</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md leading-tight text-primary-fixed">VAULT_OS</div>
+<div class="font-label-code text-label-code opacity-50 tracking-tight">Secure Terminal</div>
+</div>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto px-xs">
+<!-- Nav Items -->
+<a class="flex items-center text-on-surface-variant py-3 px-md hover:bg-surface-bright/50 transition-all group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary-container">folder_check</span>
+<span class="font-label-code text-label-code tracking-tight">Vault Files</span>
+</a>
+<a class="flex items-center text-on-surface-variant py-3 px-md hover:bg-surface-bright/50 transition-all group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary-container">terminal</span>
+<span class="font-label-code text-label-code tracking-tight">Audit Log</span>
+</a>
+<a class="flex items-center text-on-surface-variant py-3 px-md hover:bg-surface-bright/50 transition-all group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary-container">vpn_key</span>
+<span class="font-label-code text-label-code tracking-tight">Security Keys</span>
+</a>
+<a class="flex items-center text-on-surface-variant py-3 px-md hover:bg-surface-bright/50 transition-all group" href="#">
+<span class="material-symbols-outlined mr-md group-hover:text-primary-container">group</span>
+<span class="font-label-code text-label-code tracking-tight">Beneficiaries</span>
+</a>
+<a class="flex items-center text-primary-container border-l-2 border-primary-container bg-primary-container/5 py-3 px-md transition-all" href="#">
+<span class="material-symbols-outlined mr-md" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="font-label-code text-label-code font-bold tracking-tight">Settings</span>
+</a>
+</div>
+<div class="px-md py-lg border-t border-outline-variant/10">
+<button class="w-full bg-primary-container text-on-primary-container font-label-code text-label-code py-3 px-md rounded liquid-glow transition-all active:scale-95 duration-100 flex items-center justify-center gap-2 tracking-tight">
+<span class="material-symbols-outlined text-sm">lock_open</span>
+                    Initialize Escrow
+                </button>
+</div>
+<div class="px-xs flex flex-col gap-xs">
+<a class="flex items-center text-on-surface-variant py-3 px-md hover:bg-surface-bright/50 transition-all" href="#">
+<span class="material-symbols-outlined mr-md">description</span>
+<span class="font-label-code text-label-code tracking-tight">Docs</span>
+</a>
+<a class="flex items-center text-error py-3 px-md hover:bg-error-container/10 transition-all" href="#">
+<span class="material-symbols-outlined mr-md">logout</span>
+<span class="font-label-code text-label-code tracking-tight">Logout</span>
+</a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="ml-[260px] flex-1 flex flex-col relative">
+<!-- Workspace Tabs (VS Code style) -->
+<div class="h-10 bg-surface-container-lowest border-b border-outline-variant/20 flex items-center z-10">
+<div class="h-full px-lg flex items-center gap-md bg-surface-container border-r border-outline-variant/30 text-primary-fixed border-t-2 border-t-primary-container">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span class="font-label-code text-label-code tracking-tight">system_protocols.cfg</span>
+<span class="material-symbols-outlined text-[14px] opacity-50 hover:opacity-100 cursor-pointer">close</span>
+</div>
+<div class="h-full px-lg flex items-center gap-md hover:bg-surface-container-low transition-colors text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined text-[16px]">history</span>
+<span class="font-label-code text-label-code tracking-tight">audit_trail.log</span>
+</div>
+</div>
+<div class="flex-1 flex overflow-hidden relative">
+<!-- Particle Layer (added here to be in the background of config area) -->
+<div id="particle-container"></div>
+<!-- Vertical Config Categories -->
+<aside class="w-64 border-r border-outline-variant/10 bg-surface-container-low/30 p-md flex flex-col gap-xs z-10">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-md px-md opacity-40">CATEGORIES</div>
+<button class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:bg-surface-bright/50 rounded transition-all font-label-code text-label-code group tracking-tight"><span class="material-symbols-outlined text-[10px] text-primary-container opacity-50 animate-pulse">radio_button_checked</span>
+<span class="material-symbols-outlined opacity-60 group-hover:text-primary-container">public</span>
+                        Network
+                    </button>
+<button class="flex items-center gap-md px-md py-3 text-primary-container bg-primary-container/10 border border-primary-container/20 rounded transition-all font-label-code text-label-code tracking-tight"><span class="material-symbols-outlined text-[10px] text-primary-container opacity-50 animate-pulse">radio_button_checked</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">encrypted</span>
+                        Encryption
+                    </button>
+<button class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:bg-surface-bright/50 rounded transition-all font-label-code text-label-code group tracking-tight"><span class="material-symbols-outlined text-[10px] text-primary-container opacity-50 animate-pulse">radio_button_checked</span>
+<span class="material-symbols-outlined opacity-60 group-hover:text-primary-container">dns</span>
+                        Node Config
+                    </button>
+<button class="flex items-center gap-md px-md py-3 text-on-surface-variant hover:bg-surface-bright/50 rounded transition-all font-label-code text-label-code group tracking-tight"><span class="material-symbols-outlined text-[10px] text-primary-container opacity-50 animate-pulse">radio_button_checked</span>
+<span class="material-symbols-outlined opacity-60 group-hover:text-primary-container">policy</span>
+                        Global Policies
+                    </button>
+</aside>
+<!-- Config Panel -->
+<div class="flex-1 p-xl overflow-y-auto z-10">
+<div class="max-w-3xl">
+<div class="flex items-center gap-md mb-sm">
+<h2 class="font-headline-md text-headline-md text-primary">Encryption Protocols</h2>
+<div class="h-[1px] flex-1 bg-gradient-to-r from-primary-container/40 to-transparent"></div>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-xl max-w-xl">Configure high-level cryptographic standards for all node communications and file storage segments. Changes require node re-initialization.</p>
+<div class="grid gap-lg">
+<!-- AES-256 Card -->
+<div class="protocol-card glass-panel p-lg rounded-lg border-l-4 border-l-outline-variant/40 flex items-center justify-between group hover:border-l-primary-container transition-all cursor-pointer">
+<div class="flex gap-lg items-center">
+<div class="w-12 h-12 rounded border border-outline-variant/30 flex items-center justify-center bg-surface-container-highest/30">
+<span class="material-symbols-outlined text-outline">key</span>
+</div>
+<div>
+<h3 class="font-label-code text-label-code font-bold text-primary-fixed tracking-tight">AES-256-GCM</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Standard symmetric encryption for general data streams.</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant opacity-40">STABLE</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+<!-- Quantum-Resistant Card (Active) -->
+<div class="protocol-card p-lg rounded-lg border border-primary-container/30 bg-primary-container/5 shadow-[0_0_20px_rgba(0,245,255,0.05)] flex items-center justify-between relative overflow-hidden shadow-[0_0_20px_rgba(0,245,255,0.2)] cursor-pointer">
+<div class="absolute top-0 left-0 w-1 h-full bg-primary-container"></div>
+<div class="flex gap-lg items-center">
+<div class="w-12 h-12 rounded border border-primary-container/50 flex items-center justify-center bg-primary-container/10">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<div class="flex items-center gap-sm">
+<h3 class="font-label-code text-label-code font-bold text-primary-container tracking-tight">Quantum-Resistant Layer</h3>
+<span class="text-[10px] font-label-caps bg-primary-container text-on-primary-container px-2 rounded-full">ACTIVE</span>
+</div>
+<p class="font-body-sm text-body-sm text-primary/70">Lattice-based cryptography for post-quantum security hardening.</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-label-caps text-primary-fixed">OPTIMIZED</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container shadow-[0_0_10px_rgba(0,245,255,0.4)]"></div>
+</label>
+</div>
+</div>
+<!-- SHA-512 Card -->
+<div class="protocol-card glass-panel p-lg rounded-lg border-l-4 border-l-outline-variant/40 flex items-center justify-between group hover:border-l-primary-container transition-all cursor-pointer">
+<div class="flex gap-lg items-center">
+<div class="w-12 h-12 rounded border border-outline-variant/30 flex items-center justify-center bg-surface-container-highest/30">
+<span class="material-symbols-outlined text-outline">fingerprint</span>
+</div>
+<div>
+<h3 class="font-label-code text-label-code font-bold text-primary-fixed tracking-tight">SHA-512 Hashing</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Cryptographic hash for ensuring data integrity across nodes.</p>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<span class="font-label-caps text-label-caps text-on-surface-variant opacity-40">LEGACY_COMPAT</span>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+<!-- Range Slider Section -->
+<div class="mt-xl glass-panel p-lg rounded border border-outline-variant/20">
+<div class="flex justify-between items-end mb-lg">
+<div>
+<div class="font-label-caps text-label-caps text-on-surface-variant opacity-60 mb-1">RESOURCE_ALLOCATION</div>
+<h3 class="font-label-code text-label-code font-bold text-primary tracking-tight">Encryption Depth</h3>
+</div>
+<div class="text-right">
+<span class="font-label-code text-headline-md text-primary-container tracking-tight" id="depth-val">2048</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant ml-1">BITS</span>
+</div>
+</div>
+<input class="w-full mb-md transition-all" id="depth-slider" max="4096" min="512" step="512" type="range" value="2048"/>
+<div class="flex justify-between font-label-code text-[10px] text-on-surface-variant opacity-40 px-1 tracking-tight">
+<span>512-bit</span>
+<span>1024-bit</span>
+<span>2048-bit</span>
+<span>3072-bit</span>
+<span>4096-bit</span>
+</div>
+<div class="mt-lg flex items-start gap-md p-md bg-secondary-container/5 rounded border border-secondary-fixed/10">
+<span class="material-symbols-outlined text-secondary-fixed text-sm">info</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Higher encryption depth increases security but may cause a <span class="text-secondary-fixed">15-20% latency increase</span> on low-power nodes.</p>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="mt-xl flex justify-end gap-md">
+<button class="px-lg py-3 rounded font-label-code text-label-code text-on-surface-variant hover:text-primary transition-colors tracking-tight">
+                                Reset Defaults
+                            </button>
+<button class="deploy-button px-xl py-3 rounded bg-primary-container text-on-primary-container font-label-code text-label-code font-bold shadow-[0_0_20px_rgba(0,245,255,0.2)] hover:shadow-[0_0_30px_rgba(0,245,255,0.4)] transition-all liquid-glow tracking-tight flex items-center justify-center min-w-[180px]" id="deploy-btn">
+<span class="btn-text">Deploy Protocols</span>
+<div class="loader">
+<svg class="animate-spin h-5 w-5 text-on-primary-container" fill="none" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+</svg>
+</div>
+</button>
+</div>
+</div>
+</div>
+<!-- Right Gutter / System Monitor (Technical Minimalist) -->
+<aside class="w-80 border-l border-outline-variant/10 bg-surface-container-lowest/50 p-lg hidden xl:block z-10">
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-xl opacity-40">NODE_TELEMETRY</div>
+<div class="space-y-xl">
+<div>
+<div class="flex justify-between items-center mb-sm">
+<span class="font-label-code text-label-code opacity-70 text-on-surface-variant tracking-tight">CPU Entropy</span>
+<span class="font-label-code text-label-code text-primary-container tracking-tight" id="entropy-text">0.88</span>
+</div>
+<!-- Dynamic CPU Entropy SVG -->
+<div class="relative h-20 w-full flex items-center justify-center bg-surface-container-low rounded border border-outline-variant/10 overflow-hidden">
+<svg class="w-full h-full opacity-60" viewbox="0 0 200 40">
+<path d="M0 20 Q 50 20, 100 20 T 200 20" fill="transparent" id="entropy-path" stroke="#00f5ff" stroke-width="2"></path>
+<path d="M0 20 Q 50 20, 100 20 T 200 20" fill="transparent" id="entropy-path-bg" opacity="0.3" stroke="#00f5ff" stroke-width="1"></path>
+</svg>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-sm">
+<span class="font-label-code text-label-code opacity-70 text-on-surface-variant tracking-tight">Network Load</span>
+<span class="font-label-code text-label-code text-secondary-fixed tracking-tight" id="network-status">Stable</span>
+</div>
+<!-- Circular Network Load Indicator -->
+<div class="flex justify-center items-center py-md">
+<div class="relative w-24 h-24">
+<svg class="w-full h-full transform -rotate-90">
+<circle cx="48" cy="48" fill="transparent" r="40" stroke="#192121" stroke-width="4"></circle>
+<circle class="transition-all duration-1000 ease-out" cx="48" cy="48" fill="transparent" id="network-ring" r="40" stroke="#61ff97" stroke-dasharray="251.2" stroke-dashoffset="100" stroke-width="4"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-label-code text-label-code text-secondary-fixed" id="network-percent">60%</span>
+</div>
+</div>
+</div>
+</div>
+<div class="p-md bg-surface-container-low rounded border border-outline-variant/10">
+<h4 class="font-label-caps text-label-caps text-on-surface-variant opacity-60 mb-md">LATEST_AUDIT</h4>
+<ul class="font-label-code text-[11px] space-y-md text-on-surface-variant/80 tracking-tight">
+<li class="flex items-start gap-sm">
+<span class="text-primary-container">[14:22:01]</span>
+<span>Key Rotation Sync: Successful</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="text-primary-container">[13:05:44]</span>
+<span>Handshake: AES-256-GCM established</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="text-secondary-fixed">[12:59:12]</span>
+<span>Quantum Layer integrity check: 100%</span>
+</li>
+<li class="flex items-start gap-sm">
+<span class="text-tertiary-fixed">[11:45:30]</span>
+<span>Node #742 heartbeat detected</span>
+</li>
+</ul>
+</div>
+<div class="rounded-lg overflow-hidden border border-outline-variant/30 h-40 relative group cursor-crosshair">
+<div class="absolute inset-0 bg-primary-container/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
+<span class="font-label-code text-label-code bg-black/80 px-2 py-1 rounded tracking-tight">DECRYPT_STREAM</span>
+</div>
+<img alt="Terminal Data Stream" class="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 transition-all duration-500" src="https://lh3.googleusercontent.com/aida/AP1WRLuCF-ufZMreXX262ca6q_GiGfYsLZhsU7s7sahZX0FGZxVAAkBTlznsVAu68eJphW3POIpAJK1ReLQaOvw7AfVu2kzM5BZ4e-Vp4rkmogfkO4HZFQBzzeB3W25bbBukwfxPZejL-azpmlRgVIXRYQeNNIZk7QXLUTJSlCTKf6sqeQ-SHhbyrApfSQc-JpCq-W0N29Agy9_G84Y_aRCgbUGMbGvHh1zGzmjP9RK5N6dFe4W9AEw_SirAWCw"/>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<script>
+        // Micro-interaction for slider
+        const slider = document.getElementById('depth-slider');
+        const valDisplay = document.getElementById('depth-val');
+        
+        slider.addEventListener('input', (e) => {
+            valDisplay.textContent = e.target.value;
+            valDisplay.classList.add('animate-pulse');
+            setTimeout(() => valDisplay.classList.remove('animate-pulse'), 500);
+        });
+
+        // Digital Dust Particles
+        const particleContainer = document.getElementById('particle-container');
+        const createParticle = () => {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = Math.random() * 3 + 1;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.left = `${Math.random() * 100}%`;
+            p.style.animationDuration = `${Math.random() * 5 + 5}s`;
+            p.style.opacity = Math.random() * 0.4;
+            particleContainer.appendChild(p);
+            setTimeout(() => p.remove(), 10000);
+        };
+        setInterval(createParticle, 400);
+
+        // Dynamic Telemetry: Waveform (Entropy)
+        const entropyPath = document.getElementById('entropy-path');
+        const entropyText = document.getElementById('entropy-text');
+        let t = 0;
+        const animateEntropy = () => {
+            t += 0.05;
+            const points = [];
+            const val = 0.8 + Math.sin(t * 0.5) * 0.1;
+            entropyText.textContent = val.toFixed(2);
+            for (let x = 0; x <= 200; x += 10) {
+                const y = 20 + Math.sin(t + x * 0.05) * 10;
+                points.push(`${x},${y}`);
+            }
+            entropyPath.setAttribute('d', `M ${points.join(' L ')}`);
+            requestAnimationFrame(animateEntropy);
+        };
+        animateEntropy();
+
+        // Dynamic Telemetry: Circular Progress (Network)
+        const networkRing = document.getElementById('network-ring');
+        const networkPercent = document.getElementById('network-percent');
+        const updateNetwork = () => {
+            const p = Math.floor(Math.random() * 40 + 40); // 40-80%
+            const offset = 251.2 - (251.2 * p / 100);
+            networkRing.style.strokeDashoffset = offset;
+            networkPercent.textContent = `${p}%`;
+            
+            if (p > 75) {
+                networkRing.style.stroke = '#ffb4ab';
+                document.getElementById('network-status').textContent = 'Heavy';
+            } else {
+                networkRing.style.stroke = '#61ff97';
+                document.getElementById('network-status').textContent = 'Stable';
+            }
+        };
+        setInterval(updateNetwork, 3000);
+        updateNetwork();
+
+        // Deploy Button Loading State
+        const deployBtn = document.getElementById('deploy-btn');
+        deployBtn.addEventListener('click', () => {
+            deployBtn.classList.add('processing');
+            setTimeout(() => {
+                deployBtn.classList.remove('processing');
+                // Potential notification here
+            }, 3000);
+        });
+
+        // Atmospheric pulses
+        setInterval(() => {
+            const nodes = document.querySelectorAll('.animate-pulse');
+            nodes.forEach(node => {
+                node.style.opacity = Math.random() * 0.5 + 0.5;
+            });
+        }, 2000);
+    </script>
+</body></html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Developer Escrow Vault - Main Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "tertiary-container": "#ffdb3f",
+                "on-secondary": "#003919",
+                "on-secondary-fixed-variant": "#005227",
+                "surface-container-highest": "#2e3637",
+                "surface-container-low": "#151d1d",
+                "on-primary-fixed-variant": "#004f53",
+                "surface-bright": "#323b3b",
+                "primary": "#e9feff",
+                "on-surface-variant": "#b9caca",
+                "inverse-surface": "#dce4e4",
+                "primary-container": "#00f5ff",
+                "outline-variant": "#3a494a",
+                "error": "#ffb4ab",
+                "on-surface": "#dce4e4",
+                "on-tertiary-fixed-variant": "#544600",
+                "on-secondary-fixed": "#00210c",
+                "inverse-on-surface": "#2a3232",
+                "surface": "#0d1515",
+                "background": "#0d1515",
+                "primary-fixed": "#63f7ff",
+                "tertiary": "#fff9f0",
+                "on-error": "#690005",
+                "surface-variant": "#2e3637",
+                "tertiary-fixed": "#ffe16c",
+                "surface-tint": "#00dce5",
+                "on-primary-fixed": "#002021",
+                "on-background": "#dce4e4",
+                "outline": "#849495",
+                "surface-container-lowest": "#081010",
+                "secondary-container": "#36ff8b",
+                "primary-fixed-dim": "#00dce5",
+                "inverse-primary": "#00696e",
+                "surface-dim": "#0d1515",
+                "on-tertiary-fixed": "#221b00",
+                "on-primary": "#003739",
+                "on-tertiary": "#3a3000",
+                "secondary": "#f5fff2",
+                "on-primary-container": "#006c71",
+                "secondary-fixed": "#61ff97",
+                "surface-container": "#192121",
+                "on-secondary-container": "#007238",
+                "secondary-fixed-dim": "#00e476",
+                "on-tertiary-container": "#736000",
+                "surface-container-high": "#232b2c",
+                "tertiary-fixed-dim": "#e7c427",
+                "on-error-container": "#ffdad6",
+                "error-container": "#93000a"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.125rem",
+                "lg": "0.25rem",
+                "xl": "0.5rem",
+                "full": "0.75rem"
+              },
+              "spacing": {
+                "xl": "48px",
+                "margin": "32px",
+                "gutter": "20px",
+                "md": "16px",
+                "lg": "24px",
+                "sm": "8px",
+                "unit": "4px",
+                "xs": "4px"
+              },
+              "fontFamily": {
+                "headline-lg": ["Geist"],
+                "headline-md": ["Geist"],
+                "label-code": ["JetBrains Mono"],
+                "body-sm": ["Geist"],
+                "body-lg": ["Geist"],
+                "label-caps": ["JetBrains Mono"]
+              },
+              "fontSize": {
+                "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                "label-code": ["13px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-panel {
+            background: rgba(21, 29, 29, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-panel:hover {
+            border-color: rgba(0, 245, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+        }
+        .code-syntax-keyword { color: #00f5ff; }
+        .code-syntax-string { color: #36ff8b; }
+        .code-syntax-comment { color: #849495; }
+        
+        /* Hacker Visuals */
+        .scanline {
+            width: 100%;
+            height: 100px;
+            z-index: 10;
+            background: linear-gradient(0deg, rgba(0, 245, 255, 0) 0%, rgba(0, 245, 255, 0.03) 50%, rgba(0, 245, 255, 0) 100%);
+            opacity: 0.1;
+            position: absolute;
+            bottom: 100%;
+            pointer-events: none;
+            animation: scanline 8s linear infinite;
+        }
+        @keyframes scanline {
+            0% { bottom: 100%; }
+            100% { bottom: -100px; }
+        }
+        
+        .crt-flicker {
+            animation: flicker 0.15s infinite;
+        }
+        @keyframes flicker {
+            0% { opacity: 0.98; }
+            5% { opacity: 0.95; }
+            10% { opacity: 0.99; }
+            100% { opacity: 1; }
+        }
+
+        .liquid-glass {
+            position: relative;
+            overflow: hidden;
+        }
+        .liquid-glass::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            pointer-events: none;
+        }
+        .liquid-glass:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+
+        /* Entrance Animations */
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-entrance {
+            animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+        }
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #3a494a; border-radius: 2px; }
+        
+        body {
+            background-color: #0d1515;
+        }
+        #matrix-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.15;
+        }
+    </style>
+</head>
+<body class="h-screen overflow-hidden text-on-surface font-body-sm flex flex-col">
+<canvas id="matrix-canvas"></canvas>
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-margin h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 shadow-sm animate-entrance">
+<div class="flex items-center gap-md">
+<span class="font-headline-md font-bold text-primary tracking-tighter">ESCROW VAULT</span>
+<div class="h-4 w-px bg-outline-variant/50 mx-2"></div>
+<nav class="hidden md:flex gap-lg">
+<a class="font-body-sm text-primary border-b-2 border-primary-container pb-1" href="#">Dashboard</a>
+<a class="font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Workspace</a>
+<a class="font-body-sm text-on-surface-variant hover:text-on-surface transition-colors" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="flex gap-sm">
+<button class="p-2 hover:text-primary-fixed duration-300 transition-transform active:scale-95"><span class="material-symbols-outlined">notifications_active</span></button>
+<button class="p-2 hover:text-primary-fixed duration-300 transition-transform active:scale-95"><span class="material-symbols-outlined">lock_open</span></button>
+<button class="p-2 hover:text-primary-fixed duration-300 transition-transform active:scale-95"><span class="material-symbols-outlined">power_settings_new</span></button>
+</div>
+<button class="bg-primary-container text-on-primary-container px-md py-sm font-label-caps rounded-lg hover:shadow-[0_0_15px_rgba(0,245,255,0.4)] transition-all liquid-glass">DEPOSIT ASSETS</button>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar / File Explorer -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] w-[280px] bg-surface-container-low/70 backdrop-blur-xl border-r border-white/10 flex flex-col z-40 hidden md:flex animate-entrance delay-100">
+<div class="p-lg flex flex-col gap-xs relative overflow-hidden">
+<div class="scanline"></div>
+<div class="flex items-center justify-between mb-md">
+<span class="font-label-caps text-primary-container tracking-widest text-[10px]">EXPLORER</span>
+<span class="material-symbols-outlined text-sm text-outline">more_horiz</span>
+</div>
+<div class="space-y-1">
+<div class="flex items-center gap-sm p-2 text-on-surface-variant cursor-pointer group">
+<span class="material-symbols-outlined text-sm transition-transform group-hover:rotate-90">chevron_right</span>
+<span class="material-symbols-outlined text-sm">folder_open</span>
+<span class="font-label-code">Vault Files</span>
+</div>
+<div class="pl-md space-y-1">
+<div class="flex items-center gap-sm py-2 px-4 text-primary-container border-l-2 border-primary-container bg-primary-container/5 cursor-pointer">
+<span class="material-symbols-outlined text-sm">lock</span>
+<span class="font-label-code">.env(project_alpha)</span>
+</div>
+<div class="flex items-center gap-sm py-2 px-4 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm">data_object</span>
+<span class="font-label-code">database_keys.json</span>
+</div>
+</div>
+<div class="flex items-center gap-sm p-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer mt-md">
+<span class="material-symbols-outlined text-sm">security</span>
+<span class="font-label-code">Audit Log</span>
+</div>
+<div class="flex items-center gap-sm p-2 text-on-surface-variant hover:text-on-surface transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-sm">vpn_key</span>
+<span class="font-label-code">Security Keys</span>
+</div>
+</div>
+</div>
+<div class="mt-auto p-lg border-t border-white/5 bg-black/20">
+<div class="flex items-center gap-md mb-md">
+<div class="w-10 h-10 rounded-full bg-surface-container-highest border border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+</div>
+<div>
+<p class="font-label-code text-on-surface text-xs font-bold">ESCROW VAULT</p>
+<p class="font-label-code text-[10px] text-outline">SECURE_SESSION: 0x82A1</p>
+</div>
+</div>
+<button class="w-full py-2 border border-error/30 text-error font-label-caps text-[10px] hover:bg-error/10 transition-colors liquid-glass">TERMINATE SESSION</button>
+</div>
+</aside>
+<!-- Main Workspace -->
+<main class="flex-1 ml-0 md:ml-[280px] p-lg flex flex-col gap-lg overflow-hidden animate-entrance delay-200">
+<!-- Central Code Panel -->
+<section class="flex-1 flex flex-col glass-panel rounded-xl overflow-hidden border-t-weighted transition-all duration-500 hover:shadow-[0_0_40px_rgba(0,245,255,0.08)] relative">
+<div class="scanline"></div>
+<!-- Tab Interface -->
+<div class="flex bg-surface-container-lowest/50 border-b border-outline-variant/30 px-md">
+<div class="flex items-center px-lg py-3 gap-sm bg-surface-container-low border-t-2 border-primary-container relative group cursor-pointer">
+<span class="material-symbols-outlined text-sm text-secondary-container">terminal</span>
+<span class="font-label-code text-primary">Escrow_Script.sh</span>
+<span class="material-symbols-outlined text-xs text-outline hover:text-on-surface">close</span>
+</div>
+</div>
+<!-- Editor Area -->
+<div class="flex-1 p-lg bg-[#050505]/80 overflow-y-auto font-label-code text-sm leading-relaxed custom-scrollbar crt-flicker">
+<div class="flex gap-lg">
+<div class="text-outline/30 text-right select-none pr-md border-r border-outline-variant/10 min-w-[3rem]">
+                            1<br/>2<br/>3<br/>4<br/>5<br/>6<br/>7<br/>8<br/>9<br/>10<br/>11<br/>12<br/>13<br/>14<br/>15<br/>16
+                        </div>
+<div class="flex-1">
+<p><span class="code-syntax-comment"># Escrow Alpha Release Protocol</span></p>
+<p><span class="code-syntax-keyword">import</span> vault_sec <span class="code-syntax-keyword">as</span> vs</p>
+<p><span class="code-syntax-keyword">from</span> crypto <span class="code-syntax-keyword">import</span> aes_256_gcm</p>
+<p> </p>
+<p><span class="code-syntax-keyword">def</span> <span class="text-primary-container">initiate_escrow_handshake</span>(target_id):</p>
+<p>    session = vs.Connect(port=<span class="text-tertiary-fixed-dim">8443</span>)</p>
+<p>    <span class="code-syntax-keyword">if</span> session.is_authenticated():</p>
+<p>        payload = {<span class="code-syntax-string">"status"</span>: <span class="code-syntax-string">"SECURED"</span>, <span class="code-syntax-string">"entropy"</span>: vs.GetRandom()}</p>
+<p>        <span class="code-syntax-keyword">return</span> aes_256_gcm.encrypt(payload, vs.PRIVATE_KEY)</p>
+<p> </p>
+<p><span class="code-syntax-comment"># Monitor thread active</span></p>
+<p><span class="text-primary-container">print</span>(<span class="code-syntax-string">"[*] System initialized. Awaiting countdown..."</span>)</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Bottom Data Grid -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-lg h-1/4">
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between border-l-4 border-primary-container">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-outline text-[10px]">INTEGRITY HASH</span>
+<span class="material-symbols-outlined text-primary-container text-md">verified_user</span>
+</div>
+<div class="font-label-code text-on-surface truncate">SHA256: 8f2a...e901</div>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container w-3/4 shadow-[0_0_8px_rgba(0,245,255,0.6)]"></div>
+</div>
+</div>
+<!-- Node Telemetry / Animated Bar Chart -->
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between border-l-4 border-secondary-container">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-outline text-[10px]">NODE TELEMETRY</span>
+<span class="material-symbols-outlined text-secondary-container text-md">hub</span>
+</div>
+<div class="flex-1 flex items-end gap-1.5 h-12 py-1">
+<!-- Animated SVG Bars -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 100 24">
+<rect class="text-secondary-container/40" fill="currentColor" height="16" width="8" x="0" y="8">
+<animate attributename="height" dur="3s" repeatcount="indefinite" values="8;16;12;20;8"></animate>
+<animate attributename="y" dur="3s" repeatcount="indefinite" values="16;8;12;4;16"></animate>
+</rect>
+<rect class="text-secondary-container/60" fill="currentColor" height="20" width="8" x="12" y="4">
+<animate attributename="height" dur="2.5s" repeatcount="indefinite" values="12;24;16;20;12"></animate>
+<animate attributename="y" dur="2.5s" repeatcount="indefinite" values="12;0;8;4;12"></animate>
+</rect>
+<rect class="text-secondary-container" fill="currentColor" height="14" width="8" x="24" y="10">
+<animate attributename="height" dur="4s" repeatcount="indefinite" values="14;6;22;14;14"></animate>
+<animate attributename="y" dur="4s" repeatcount="indefinite" values="10;18;2;10;10"></animate>
+</rect>
+<rect class="text-secondary-container/30" fill="currentColor" height="10" width="8" x="36" y="14">
+<animate attributename="height" dur="2.8s" repeatcount="indefinite" values="10;20;8;12;10"></animate>
+<animate attributename="y" dur="2.8s" repeatcount="indefinite" values="14;4;16;12;14"></animate>
+</rect>
+<rect class="text-secondary-container/80" fill="currentColor" height="22" width="8" x="48" y="2">
+<animate attributename="height" dur="3.2s" repeatcount="indefinite" values="22;12;24;18;22"></animate>
+<animate attributename="y" dur="3.2s" repeatcount="indefinite" values="2;12;0;6;2"></animate>
+</rect>
+</svg>
+</div>
+<div class="font-headline-md text-secondary-fixed-dim text-sm">14 NODES <span class="text-[10px] text-outline uppercase ml-2">Latency: 14ms</span></div>
+</div>
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between border-l-4 border-tertiary-fixed-dim">
+<div class="flex justify-between items-start">
+<span class="font-label-caps text-outline text-[10px]">VULNERABILITY SCAN</span>
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-md">radar</span>
+</div>
+<div class="font-label-code text-on-surface">NO THREATS DETECTED</div>
+<div class="text-[10px] text-tertiary-fixed-dim uppercase animate-pulse">Scanning layer 7 protocols...</div>
+</div>
+</section>
+</main>
+<!-- Right Sidebar -->
+<aside class="w-[320px] h-[calc(100vh-64px)] border-l border-white/10 p-lg flex flex-col gap-lg hidden xl:flex glass-panel !bg-surface-container-lowest/40 animate-entrance delay-300">
+<!-- Countdown Timer -->
+<div class="flex flex-col items-center gap-md p-lg bg-white/5 rounded-xl border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2">
+<div class="flex items-center gap-xs">
+<div class="w-2 h-2 rounded-full bg-secondary-container animate-pulse shadow-[0_0_8px_rgba(54,255,139,0.5)]"></div>
+<span class="font-label-caps text-[10px] text-secondary-container">ACTIVE</span>
+</div>
+</div>
+<span class="font-label-caps text-outline text-[12px] tracking-[0.2em]">DECRYPT_TIMER</span>
+<div class="font-label-code text-4xl text-primary font-bold tracking-tighter tabular-nums drop-shadow-[0_0_10px_rgba(0,245,255,0.3)]" id="countdown">48:00:00</div>
+<button class="w-full py-3 bg-white/5 hover:bg-white/10 border border-outline-variant/50 rounded-lg text-xs font-label-caps transition-all active:scale-[0.98] liquid-glass">EXTEND LOCKOUT</button>
+</div>
+<!-- System Health Animated Pie Chart -->
+<div class="flex flex-col gap-md p-lg bg-white/5 rounded-xl border border-white/5 relative overflow-hidden">
+<span class="font-label-caps text-outline text-[10px]">SYSTEM HEALTH</span>
+<div class="flex items-center justify-center py-2 relative">
+<svg class="w-24 h-24 transform -rotate-90">
+<circle class="text-white/5" cx="48" cy="48" fill="transparent" r="40" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary-container" cx="48" cy="48" fill="transparent" id="health-ring" r="40" stroke="currentColor" stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-width="8">
+<animate attributename="stroke-dashoffset" dur="1.5s" fill="freeze" from="251.2" to="12.5"></animate>
+</circle>
+</svg>
+<div class="absolute font-label-code text-primary text-xl">95%</div>
+</div>
+<div class="flex justify-between text-[10px] font-label-caps text-outline">
+<span>Optimized</span>
+<span class="text-primary-container">Secure</span>
+</div>
+</div>
+<!-- Beneficiaries -->
+<div class="flex-1 flex flex-col gap-md">
+<div class="flex justify-between items-center">
+<span class="font-label-caps text-on-surface text-[12px]">BENEFICIARIES</span>
+<span class="material-symbols-outlined text-on-surface-variant hover:text-primary cursor-pointer text-sm">person_add</span>
+</div>
+<div class="space-y-sm overflow-y-auto custom-scrollbar pr-2 flex-1">
+<div class="p-md bg-white/5 border border-white/5 rounded-lg flex items-center gap-md hover:bg-white/10 transition-colors group">
+<div class="w-8 h-8 rounded bg-primary-container/20 border border-primary-container/30 flex items-center justify-center font-label-code text-primary group-hover:border-primary-container transition-colors">LD</div>
+<div class="flex-1">
+<p class="text-xs font-bold">Lead Dev</p>
+<p class="text-[10px] text-outline">0x92...f82a</p>
+</div>
+<span class="material-symbols-outlined text-sm text-secondary-container" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<!-- Add Beneficiary Form -->
+<div class="mt-auto space-y-sm">
+<div class="relative">
+<input class="w-full bg-[#050505] border border-outline-variant/30 rounded-lg px-md py-2 text-xs font-label-code focus:ring-1 focus:ring-primary-container focus:border-primary-container outline-none transition-all placeholder:text-outline/50" placeholder="Wallet Address (0x...)" type="text"/>
+</div>
+<button class="w-full py-2 bg-primary-container/10 border border-primary-container/50 text-primary-container font-label-caps text-[10px] hover:bg-primary-container/20 transition-all rounded-lg liquid-glass">AUTHORIZE NEW ENTITY</button>
+</div>
+</div>
+</aside>
+</div>
+<script>
+    // Matrix Background Animation
+    const canvas = document.getElementById('matrix-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    const columns = Math.floor(width / 20);
+    const characters = "0123456789ABCDEF!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const charArray = characters.split('');
+    const drops = new Array(columns).fill(0);
+
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(13, 21, 21, 0.05)';
+        ctx.fillRect(0, 0, width, height);
+        
+        ctx.fillStyle = '#00f5ff';
+        ctx.font = '14px JetBrains Mono';
+
+        for (let i = 0; i < drops.length; i++) {
+            const text = charArray[Math.floor(Math.random() * charArray.length)];
+            ctx.fillText(text, i * 20, drops[i] * 20);
+
+            if (drops[i] * 20 > height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+
+    setInterval(drawMatrix, 50);
+
+    window.addEventListener('resize', () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    });
+
+    // Timer Script
+    let seconds = 48 * 3600;
+    const timerElement = document.getElementById('countdown');
+    
+    setInterval(() => {
+        seconds--;
+        const h = Math.floor(seconds / 3600);
+        const m = Math.floor((seconds % 3600) / 60);
+        const s = seconds % 60;
+        timerElement.textContent = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+    }, 1000);
+
+    // Subtle parallax effect
+    document.addEventListener('mousemove', (e) => {
+        const panels = document.querySelectorAll('.glass-panel');
+        const x = (e.clientX - window.innerWidth / 2) / 200;
+        const y = (e.clientY - window.innerHeight / 2) / 200;
+        
+        panels.forEach(panel => {
+            panel.style.transform = `translate(${x}px, ${y}px)`;
+        });
+    });
+</script>
+</body></html>

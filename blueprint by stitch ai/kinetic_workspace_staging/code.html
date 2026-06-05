@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VAULT_OS // Workspace</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Geist:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        .liquid-glass {
+            background: linear-gradient(135deg, rgba(25, 33, 33, 0.7) 0%, rgba(8, 16, 16, 0.8) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05);
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 15px rgba(0, 220, 229, 0.15);
+        }
+
+        .terminal-scanline {
+            background: linear-gradient(to bottom, rgba(13, 21, 21, 0) 50%, rgba(13, 21, 21, 0.2) 50%);
+            background-size: 100% 4px;
+        }
+
+        @keyframes pulse-emerald {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 2px #61ff97); }
+            50% { opacity: 0.6; filter: drop-shadow(0 0 8px #61ff97); }
+        }
+        .status-pulse { animation: pulse-emerald 4s infinite; }
+
+        @keyframes progress-load {
+            from { width: 0; }
+        }
+        .animate-progress { animation: progress-load 1.5s cubic-bezier(0.65, 0, 0.35, 1) forwards; }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            border-right: 2px solid #00e476;
+            animation: typing 0.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #00e476; }
+        }
+
+        .pie-segment {
+            transition: stroke-dasharray 1s ease-out;
+        }
+
+        #config-panel {
+            position: relative;
+            overflow: hidden;
+        }
+        #config-glow {
+            pointer-events: none;
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 220, 229, 0.1) 0%, rgba(0, 220, 229, 0) 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        #config-panel:hover #config-glow {
+            opacity: 1;
+        }
+
+        ::-webkit-scrollbar { width: 4px; height: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #3a494a; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00dce5; }
+    </style>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-lowest": "#081010",
+                    "secondary": "#f5fff2",
+                    "on-secondary-container": "#007238",
+                    "background": "#0d1515",
+                    "on-tertiary-fixed-variant": "#544600",
+                    "tertiary-fixed": "#ffe16c",
+                    "on-background": "#dce4e4",
+                    "outline": "#849495",
+                    "error": "#ffb4ab",
+                    "on-secondary": "#003919",
+                    "on-primary-fixed-variant": "#004f53",
+                    "outline-variant": "#3a494a",
+                    "on-tertiary-container": "#736000",
+                    "on-secondary-fixed-variant": "#005227",
+                    "on-primary": "#003739",
+                    "inverse-surface": "#dce4e4",
+                    "on-surface": "#dce4e4",
+                    "on-tertiary": "#3a3000",
+                    "surface-container-highest": "#2e3637",
+                    "surface-container-low": "#151d1d",
+                    "surface-container-high": "#232b2c",
+                    "secondary-fixed": "#61ff97",
+                    "surface": "#0d1515",
+                    "primary": "#e9feff",
+                    "secondary-fixed-dim": "#00e476",
+                    "on-error-container": "#ffdad6",
+                    "on-primary-fixed": "#002021",
+                    "surface-variant": "#2e3637",
+                    "error-container": "#93000a",
+                    "surface-dim": "#0d1515",
+                    "on-secondary-fixed": "#00210c",
+                    "surface-bright": "#323b3b",
+                    "primary-container": "#00f5ff",
+                    "secondary-container": "#36ff8b",
+                    "on-tertiary-fixed": "#221b00",
+                    "inverse-on-surface": "#2a3232",
+                    "tertiary-container": "#ffdb3f",
+                    "tertiary": "#fff9f0",
+                    "inverse-primary": "#00696e",
+                    "on-surface-variant": "#b9caca",
+                    "tertiary-fixed-dim": "#e7c427",
+                    "on-primary-container": "#006c71",
+                    "surface-tint": "#00dce5",
+                    "surface-container": "#192121",
+                    "on-error": "#690005",
+                    "primary-fixed-dim": "#00dce5",
+                    "primary-fixed": "#63f7ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin": "32px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "xl": "48px",
+                    "gutter": "20px",
+                    "xs": "4px",
+                    "unit": "4px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "headline-lg": ["Geist"],
+                    "label-code": ["JetBrains Mono"],
+                    "label-caps": ["JetBrains Mono"],
+                    "body-lg": ["Geist"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-code": ["13px", {"lineHeight": "1.4", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                    "label-caps": ["11px", {"lineHeight": "1.2", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background selection:bg-primary-container/30 overflow-hidden h-screen flex flex-col font-body-sm">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface-container-low/70 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_0_15px_rgba(0,220,229,0.05)]">
+<div class="flex items-center gap-xl">
+<span class="font-headline-md text-headline-md font-bold tracking-tighter text-primary">VAULT_OS</span>
+<nav class="hidden md:flex gap-lg items-center h-full">
+<a class="font-label-code text-label-code text-primary border-b-2 border-primary h-16 flex items-center hover:text-primary transition-colors duration-200" href="#">Network</a>
+<a class="font-label-code text-label-code text-on-surface-variant h-16 flex items-center hover:text-primary transition-colors duration-200" href="#">Protocols</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline text-[18px]">search</span>
+</div>
+<input class="bg-surface-container-lowest/50 border border-outline-variant/50 rounded-lg pl-10 pr-4 py-1.5 text-sm focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/20 w-64 transition-all" placeholder="Search keys..." type="text"/>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-variant/40 rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-variant/40 rounded-full transition-all">account_balance_wallet</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<button class="bg-primary-container text-on-primary-container px-md py-2 rounded-lg font-label-caps text-label-caps active:scale-95 transition-transform">Deposit Assets</button>
+<img alt="User profile" class="w-8 h-8 rounded-full border border-primary/20" src="https://lh3.googleusercontent.com/aida/AP1WRLvFFNQ-V2XQaf01bjlW7_omFDzunXYMiBh2B1lieGJcfMRhJkd8a2EmsX7-3U0Y_QL2wfgVfkig9X10lpTZcf2wLJV9xrTppzKSFuswkavgaOzD8qrT7RHKmwi8nb_9MyVGkm47BBvHyi1-Nyucj8Xu6JXT6gb17QLrs7Omv3UJPZZuchRM34SnLt3YuKqlNtzmEDWcIL-X2nXyqHxMqD3hTgcefPxyD3gJ1GYHGc5HXgvGrZAq241U5Jg"/>
+</div>
+</header>
+<div class="flex flex-1 pt-16 h-full overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 bottom-0 flex flex-col z-40 bg-surface-container-lowest/80 backdrop-blur-2xl border-r border-outline-variant/20 w-64">
+<div class="p-md border-b border-outline-variant/10">
+<div class="flex items-center gap-sm mb-md">
+<div class="w-10 h-10 rounded bg-primary/10 flex items-center justify-center border border-primary/20">
+<span class="material-symbols-outlined text-primary text-[20px]">security</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md text-primary text-sm">ROOT_ACCESS</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant/60 text-[9px]">Level 4 Clearance</div>
+</div>
+</div>
+<button class="w-full bg-secondary-container/10 border border-secondary-fixed-dim/30 text-secondary-fixed py-2 rounded font-label-caps text-label-caps hover:bg-secondary-container/20 transition-all flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                    New Escrow
+                </button>
+</div>
+<nav class="flex-1 py-md">
+<div class="px-sm mb-2 font-label-caps text-label-caps text-on-surface-variant/40 text-[9px] tracking-widest">WORKSPACE</div>
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-sm px-md py-2 text-primary border-l-2 border-primary bg-primary/5 font-label-caps text-label-caps transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">folder_open</span>
+                            Vault Files
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-2 text-on-surface-variant/70 hover:bg-surface-variant/40 hover:text-primary font-label-caps text-label-caps transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+                            Audit Log
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-2 text-on-surface-variant/70 hover:bg-surface-variant/40 hover:text-primary font-label-caps text-label-caps transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">vpn_key</span>
+                            Security Keys
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-2 text-on-surface-variant/70 hover:bg-surface-variant/40 hover:text-primary font-label-caps text-label-caps transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">group</span>
+                            Beneficiaries
+                        </a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-md py-2 text-on-surface-variant/70 hover:bg-surface-variant/40 hover:text-primary font-label-caps text-label-caps transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+                            Settings
+                        </a>
+</li>
+</ul>
+</nav>
+<div class="p-md border-t border-outline-variant/10">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-sm px-sm py-1.5 text-on-surface-variant/70 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">help_outline</span>
+<span class="text-xs">Support</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-sm px-sm py-1.5 text-on-surface-variant/70 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined text-[18px]">history</span>
+<span class="text-xs">Logs</span>
+</a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 flex-1 flex flex-col h-full bg-background relative">
+<!-- Glassmorphic Grid Background Decor -->
+<div class="absolute inset-0 overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-secondary-fixed/5 blur-[100px] rounded-full"></div>
+</div>
+<!-- Workspace Viewport -->
+<div class="flex flex-1 overflow-hidden p-lg gap-lg">
+<!-- Left Pane: Asset Staging -->
+<section class="flex-[1.5] flex flex-col gap-md z-10">
+<div class="flex items-center justify-between mb-2">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">inventory_2</span>
+<h2 class="font-headline-md text-headline-md text-lg">Asset Staging</h2>
+</div>
+<span class="font-label-code text-label-code text-[10px] bg-surface-container-high px-2 py-1 rounded text-on-surface-variant">4 ITEMS QUEUED</span>
+</div>
+<div class="flex-1 overflow-y-auto space-y-4 pr-2">
+<!-- Staging Item 1 -->
+<div class="liquid-glass p-md rounded-xl flex items-center justify-between group hover:border-primary/20 transition-all duration-300">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-lowest flex items-center justify-center rounded-lg border border-outline-variant/30 group-hover:border-primary/30 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant/70 text-[28px]">lock</span>
+</div>
+<div>
+<h3 class="font-label-code text-label-code text-primary mb-1">API_KEYS_v3.env</h3>
+<p class="font-label-caps text-label-caps text-[9px] text-on-surface-variant/60">SIZE: 14KB • PATH: /root/vault/staged/</p>
+</div>
+</div>
+<div class="flex items-center gap-xl text-right">
+<div>
+<div class="font-label-caps text-label-caps text-[9px] text-secondary-fixed status-pulse mb-1">VALIDATING</div>
+<div class="w-24 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-secondary-fixed-dim shadow-[0_0_8px_#00e476] animate-progress" style="width: 65%"></div>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-error transition-all">close</button>
+</div>
+</div>
+<!-- Staging Item 2 -->
+<div class="liquid-glass p-md rounded-xl flex items-center justify-between group hover:border-primary/20 transition-all duration-300">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-lowest flex items-center justify-center rounded-lg border border-outline-variant/30 group-hover:border-primary/30 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant/70 text-[28px]">key</span>
+</div>
+<div>
+<h3 class="font-label-code text-label-code text-primary mb-1">ROOT_PRIVATE.key</h3>
+<p class="font-label-caps text-label-caps text-[9px] text-on-surface-variant/60">SIZE: 4KB • PATH: /root/ssh/staged/</p>
+</div>
+</div>
+<div class="flex items-center gap-xl text-right">
+<div>
+<div class="font-label-caps text-label-caps text-[9px] text-primary mb-1">READY</div>
+<div class="w-24 h-1 bg-primary/20 rounded-full overflow-hidden">
+<div class="h-full bg-primary-container shadow-[0_0_8px_#00f5ff] animate-progress" style="width: 100%"></div>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-error transition-all">close</button>
+</div>
+</div>
+<!-- Staging Item 3 -->
+<div class="liquid-glass p-md rounded-xl flex items-center justify-between group hover:border-primary/20 transition-all duration-300">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 bg-surface-container-lowest flex items-center justify-center rounded-lg border border-outline-variant/30 group-hover:border-primary/30 transition-all">
+<span class="material-symbols-outlined text-on-surface-variant/70 text-[28px]">description</span>
+</div>
+<div>
+<h3 class="font-label-code text-label-code text-primary mb-1">CONTRACT_MANIFEST.json</h3>
+<p class="font-label-caps text-label-caps text-[9px] text-on-surface-variant/60">SIZE: 256KB • PATH: /root/vault/staged/</p>
+</div>
+</div>
+<div class="flex items-center gap-xl text-right">
+<div>
+<div class="font-label-caps text-label-caps text-[9px] text-on-surface-variant/50 mb-1">ENCRYPTING</div>
+<div class="w-24 h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-outline-variant animate-progress" style="width: 30%"></div>
+</div>
+</div>
+<button class="material-symbols-outlined text-on-surface-variant/40 hover:text-error transition-all">close</button>
+</div>
+</div>
+<!-- Staging Item 4 -->
+<div class="liquid-glass p-md rounded-xl flex items-center justify-between group hover:border-primary/20 transition-all duration-300 border-dashed border-outline-variant/40">
+<div class="flex items-center gap-md opacity-40">
+<div class="w-12 h-12 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">add_circle</span>
+</div>
+<h3 class="font-label-code text-label-code">Drag files here to stage</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- Right Pane: Escrow Configuration -->
+<section class="flex-1 flex flex-col gap-md z-10">
+<div class="flex items-center gap-sm mb-2">
+<span class="material-symbols-outlined text-primary">tune</span>
+<h2 class="font-headline-md text-headline-md text-lg">Configuration</h2>
+</div>
+<div class="liquid-glass p-lg rounded-xl flex-1 flex flex-col glow-cyan relative" id="config-panel">
+<div id="config-glow"></div>
+<div class="space-y-6 flex-1 relative z-10">
+<!-- Allocation Split Widget -->
+<div>
+<label class="font-label-caps text-label-caps text-[10px] text-on-surface-variant/60 mb-4 block tracking-widest uppercase">Allocation Split</label>
+<div class="flex items-center gap-lg">
+<div class="relative w-24 h-24">
+<svg class="w-full h-full -rotate-90" viewbox="0 0 36 36">
+<circle cx="18" cy="18" fill="none" r="16" stroke="#2e3637" stroke-width="3"></circle>
+<!-- Segment 1: 45% (cyan) -->
+<circle class="pie-segment" cx="18" cy="18" data-value="45" fill="none" r="16" stroke="#00f5ff" stroke-dasharray="0 100" stroke-width="3"></circle>
+<!-- Segment 2: 30% (emerald) -->
+<circle class="pie-segment" cx="18" cy="18" data-value="30" fill="none" r="16" stroke="#61ff97" stroke-dasharray="0 100" stroke-dashoffset="-45" stroke-width="3"></circle>
+<!-- Segment 3: 25% (yellow) -->
+<circle class="pie-segment" cx="18" cy="18" data-value="25" fill="none" r="16" stroke="#ffe16c" stroke-dasharray="0 100" stroke-dashoffset="-75" stroke-width="3"></circle>
+</svg>
+</div>
+<div class="space-y-2">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-code text-[11px] text-on-surface">Liquidity (45%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed"></span>
+<span class="font-label-code text-[11px] text-on-surface">Vesting (30%)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed"></span>
+<span class="font-label-code text-[11px] text-on-surface">Reserve (25%)</span>
+</div>
+</div>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-[10px] text-on-surface-variant/60 mb-2 block tracking-widest uppercase">Release Condition</label>
+<div class="grid grid-cols-1 gap-2">
+<button class="flex items-center justify-between p-3 rounded-lg border border-primary/20 bg-primary/5 text-primary text-sm font-label-code">
+                                        Time-Lock (24h)
+                                        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">radio_button_checked</span>
+</button>
+<button class="flex items-center justify-between p-3 rounded-lg border border-outline-variant/30 text-on-surface-variant/70 text-sm font-label-code hover:border-primary/30 transition-all">
+                                        Multi-Sig (2/3)
+                                        <span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+</button>
+<button class="flex items-center justify-between p-3 rounded-lg border border-outline-variant/30 text-on-surface-variant/70 text-sm font-label-code hover:border-primary/30 transition-all">
+                                        Dead Man's Switch
+                                        <span class="material-symbols-outlined text-[18px]">radio_button_unchecked</span>
+</button>
+</div>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-[10px] text-on-surface-variant/60 mb-2 block tracking-widest uppercase">Encryption Level</label>
+<select class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3 text-on-background text-sm font-label-code focus:ring-1 focus:ring-primary/50 focus:border-primary/50 outline-none">
+<option>AES-256-GCM (Quantum Resistant)</option>
+<option>RSA-4096 (Hardened SHA-3)</option>
+<option>ChaCha20-Poly1305</option>
+</select>
+</div>
+<div>
+<label class="font-label-caps text-label-caps text-[10px] text-on-surface-variant/60 mb-2 block tracking-widest uppercase">Destination Vault</label>
+<div class="relative">
+<input class="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-lg p-3 text-on-background text-sm font-label-code focus:ring-1 focus:ring-primary/50 focus:border-primary/50 outline-none pr-10" type="text" value="0x8f2a...f4e1"/>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/40 text-[18px]">link</span>
+</div>
+</div>
+</div>
+<div class="pt-6 border-t border-outline-variant/20 mt-6 relative z-10">
+<button class="w-full py-4 bg-primary-container text-on-primary-container rounded-lg font-label-caps text-label-caps text-md tracking-widest shadow-[0_0_20px_rgba(0,245,255,0.3)] hover:brightness-110 active:scale-95 transition-all">
+                                INITIALIZE VAULT TRANSFER
+                            </button>
+</div>
+</div>
+</section>
+</div>
+<!-- Bottom Console (Integrity Validation) -->
+<footer class="h-48 bg-surface-container-lowest border-t border-outline-variant/30 flex flex-col font-label-code z-20">
+<div class="px-md py-1 bg-surface-container-low flex items-center justify-between border-b border-outline-variant/10">
+<div class="flex items-center gap-sm">
+<span class="w-2 h-2 bg-secondary-fixed rounded-full animate-pulse"></span>
+<span class="text-[10px] text-secondary-fixed font-bold tracking-widest uppercase">INTEGRITY CONSOLE</span>
+</div>
+<div class="flex items-center gap-md">
+<span class="text-[10px] text-on-surface-variant/40">NODE_ID: 192.168.1.104</span>
+<span class="text-[10px] text-on-surface-variant/40">LATENCY: 14ms</span>
+</div>
+</div>
+<div class="flex-1 p-md overflow-y-auto text-secondary-fixed-dim/80 text-[11px] leading-relaxed terminal-scanline space-y-0.5" id="console-output">
+<p class="text-secondary-fixed">&gt;&gt; Initializing integrity stream...</p>
+<p class="typing-effect">[20:42:01] PING node.vault.mainnet-01.local [SUCCESS]</p>
+</div>
+</footer>
+</main>
+</div>
+<script>
+        // Mouse Tracking Glow Effect for Configuration Panel
+        const configPanel = document.getElementById('config-panel');
+        const glow = document.getElementById('config-glow');
+        
+        configPanel.addEventListener('mousemove', (e) => {
+            const rect = configPanel.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            glow.style.left = `${x}px`;
+            glow.style.top = `${y}px`;
+        });
+
+        // Animate Pie Chart Segments
+        setTimeout(() => {
+            const segments = document.querySelectorAll('.pie-segment');
+            segments.forEach(seg => {
+                const val = seg.getAttribute('data-value');
+                seg.style.strokeDasharray = `${val} 100`;
+            });
+        }, 300);
+
+        // Advanced Typing Console logic
+        const consoleOutput = document.getElementById('console-output');
+        const logs = [
+            "[20:42:03] SHA-256 CHECK: API_KEYS_v3.env -> 7a82c...9e01 [VALID]",
+            "[20:42:05] SHA-256 CHECK: ROOT_PRIVATE.key -> f12e4...3b8a [VALID]",
+            "[20:42:08] SYNCING: Metadata layers 1-4...",
+            "[20:42:10] ENCRYPTION_START: RSA-4096 keypair rotation initiated.",
+            "[20:42:12] PING node.vault.mainnet-02.local [SUCCESS]",
+            "[20:42:15] SHA-256 CHECK: CONTRACT_MANIFEST.json -> e3b0c...af43 [PROCESSING]",
+            "[20:42:18] STATUS_READY: System awaiting configuration finalization.",
+            "[20:42:20] PING global-cluster-alpha [SUCCESS]",
+            "[20:42:22] HEARTBEAT: CPU 12% | MEM 2.4GB",
+            "[20:42:25] SHA-256 CHECK: DATA_PACK_004.bin -> d41d8...c906 [VALID]",
+            "[20:42:28] ENCRYPTION_STREAM: Fragmented block parity check... 100%",
+            "[20:42:30] NODE_STATUS: Active - Secured by Ledger v4",
+            "[20:42:35] ALERT: Integrity validated for staged assets."
+        ];
+        
+        let logIndex = 0;
+        function addLog() {
+            const p = document.createElement('p');
+            p.classList.add('typing-effect');
+            p.textContent = logs[logIndex % logs.length];
+            
+            // Randomly color some logs
+            if (logIndex % 3 === 0) p.classList.add('text-secondary-fixed');
+            if (logIndex % 5 === 0) p.classList.add('text-primary/70');
+            
+            consoleOutput.appendChild(p);
+            
+            // Auto-scroll to bottom
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            logIndex++;
+            
+            // Limit log count
+            if (consoleOutput.children.length > 40) {
+                consoleOutput.removeChild(consoleOutput.children[0]);
+            }
+            
+            setTimeout(addLog, Math.random() * 2000 + 1500);
+        }
+        
+        // Start adding logs after initial ones
+        setTimeout(addLog, 2000);
+
+        // Existing micro-interactions
+        const buttons = document.querySelectorAll('button');
+        buttons.forEach(btn => {
+            btn.addEventListener('mouseenter', () => {
+                btn.style.filter = 'brightness(1.2) contrast(1.1)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.filter = 'none';
+            });
+        });
+    </script>
+</body></html>
