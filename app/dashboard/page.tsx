@@ -46,16 +46,25 @@ export default function DashboardPage() {
 
   useEffect(() => {
     const initialize = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error || !session) {
-        router.push('/login'); return;
+      // Use getUser instead of getSession to guarantee the most up-to-date server state.
+      // getSession can sometimes return stale client-side caches during fast redirects.
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        router.push('/login'); 
+        return;
       } 
-      setUserId(session.user.id);
-      const { data: benData } = await supabase.from('beneficiaries').select('id, name, email').eq('user_id', session.user.id);
+      setUserId(user.id);
+      const { data: benData } = await supabase.from('beneficiaries').select('id, name, email').eq('user_id', user.id);
       if (benData) setBeneficiaries(benData);
       setSessionLoading(false);
     };
-    initialize();
+
+    // Vercel Edge propagation buffer
+    const timer = setTimeout(() => {
+      initialize();
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [router, supabase]);
 
   const hashKeyLocally = async (key: string) => {
